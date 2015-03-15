@@ -103,10 +103,7 @@ pro DGGhwVideo::GetProperty, properties = properties, $
            property = self.properties[name]
            value = idlvideo_GetProperty(*self.capture, property)
            (scope_varfetch(name, /ref_extra)) = value
-        endif else begin
-           message, name + ' is not a valid property for this camera.', /inf
-           (scope_varfetch(name, /ref_extra)) = 0
-        endelse
+        endif 
      endforeach
   endif
 end
