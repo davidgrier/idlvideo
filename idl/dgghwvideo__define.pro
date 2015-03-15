@@ -12,6 +12,8 @@
 ; PROPERTIES:
 ;    [IG ] CAMERA: Number of camera to use.
 ;        Default: 0
+;    [IGS] DIMENSIONS: [nx, ny] Size of image [pixels]
+;        Default: hardware default dimensions
 ;    [IGS] GRAYSCALE: If set, return grayscale images.
 ;    [ GS] PROPERTIES: List of OpenCV properties.  Not all of these
 ;        may be supported for any particular camera.
@@ -188,6 +190,7 @@ end
 ; DGGhwVideo::Init()
 ;
 function DGGhwVideo::Init, camera = camera, $
+                           dimensions = dimensions, $
                            grayscale = grayscale, $
                            greyscale = greyscale
 
@@ -200,7 +203,12 @@ function DGGhwVideo::Init, camera = camera, $
   self.capture = ptr_new(capture, /no_copy)
 
   self.initproperties
- 
+
+  if isa(dimensions, /number) && (n_elements(dimensions) eq 2) then begin
+     err = idlvideo_SetProperty(*self.capture, self.properties['width'], dimensions[0])
+     err = idlvideo_SetProperty(*self.capture, self.properties['height'], dimensions[1])
+  endif
+  
   self.grayscale = keyword_set(grayscale) || keyword_set(greyscale)
   
   return, 1B
