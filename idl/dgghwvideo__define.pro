@@ -58,8 +58,7 @@ pro DGGhwVideo::SetProperty, grayscale = grayscale, $
            property = self.properties[name]
            value = double(scope_varfetch(name, /ref_extra))
            err = idlvideo_SetProperty(*self.capture, property, value)
-        endif else $
-           message, name + ' is not a valid property for this camera.', /inf
+        endif
      endforeach
   endif
 
