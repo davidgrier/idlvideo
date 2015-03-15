@@ -55,9 +55,9 @@ pro DGGhwVideo::SetProperty, grayscale = grayscale, $
   if isa(propertylist) then begin
      foreach name, strlowcase(propertylist) do begin
         if self.properties.haskey(name) then begin
-           propertyid = self.properties[name]
+           property = self.properties[name]
            value = double(scope_varfetch(name, /ref_extra))
-           err = idlvideo_SetProperty(*self.capture, propertyid, value)
+           err = idlvideo_SetProperty(*self.capture, property, value)
         endif else $
            message, name + ' is not a valid property for this camera.', /inf
      endforeach
@@ -85,9 +85,11 @@ pro DGGhwVideo::GetProperty, properties = properties, $
   if arg_present(properties) then $
      properties = self.properties.keys()
 
-  if arg_present(dimensions) then $
-     dimensions = [idlvideo_GetProperty(*self.capture, self.properties['width']), $
-                   idlvideo_GetProperty(*self.capture, self.properties['height'])]
+  if arg_present(dimensions) then begin
+     width  = idlvideo_GetProperty(*self.capture, self.properties['width'])
+     height = idlvideo_GetProperty(*self.capture, self.properties['height'])
+     dimensions = long([width, height])
+  endif
 
   if arg_present(grayscale) then $
      grayscale = self.grayscale
@@ -98,9 +100,9 @@ pro DGGhwVideo::GetProperty, properties = properties, $
   if isa(propertylist) then begin
      foreach name, strlowcase(propertylist) do begin
         if self.properties.haskey(name) then begin
-           propertyid = self.properties[name]
-           prop = idlvideo_GetProperty(*self.capture, propertyid)
-           (scope_varfetch(name, /ref_extra)) = prop
+           property = self.properties[name]
+           value = idlvideo_GetProperty(*self.capture, property)
+           (scope_varfetch(name, /ref_extra)) = value
         endif else begin
            message, name + ' is not a valid property for this camera.', /inf
            (scope_varfetch(name, /ref_extra)) = 0
@@ -111,32 +113,11 @@ end
 
 ;;;;;
 ;
-; DGGhwVideo::Cleanup
+; DGGhwVideo::InitProperties
 ;
-pro DGGhwVideo::Cleanup
+pro DGGhwVideo::InitProperties
 
   COMPILE_OPT IDL2, HIDDEN
-
-  if ptr_valid(self.capture) then begin
-     idlvideo_releasecapture, *self.capture
-     ptr_free, self.capture
-  endif
-end
-
-;;;;;
-;
-; DGGhwVideo::Init()
-;
-function DGGhwVideo::Init, camera = camera, $
-                           grayscale = grayscale
-
-  COMPILE_OPT IDL2, HIDDEN
-
-  camera = isa(camera, /number, /scalar) ? long(camera) : 0L
-  capture = idlvideo_capturefromcam(camera)
-  if ~isa(capture, 'idlvideo_capture') then $
-     return, 0B
-  self.capture = ptr_new(capture, /no_copy)
 
   ;; obtained from .../include/opencv2/highgui_c.h
   properties = ['time',                 $
@@ -180,6 +161,45 @@ function DGGhwVideo::Init, camera = camera, $
   indexes = indgen(n_elements(properties))
   self.properties = orderedhash(properties, indexes)
 
+  ;;; remove inactive properties
+  foreach property, properties do $
+     if (idlvideo_GetProperty(*self.capture, self.properties[property]) eq 0) then $
+        self.properties.remove, property
+
+  help, self.properties
+end
+
+;;;;;
+;
+; DGGhwVideo::Cleanup
+;
+pro DGGhwVideo::Cleanup
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  if ptr_valid(self.capture) then begin
+     idlvideo_releasecapture, *self.capture
+     ptr_free, self.capture
+  endif
+end
+
+;;;;;
+;
+; DGGhwVideo::Init()
+;
+function DGGhwVideo::Init, camera = camera, $
+                           grayscale = grayscale
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  camera = isa(camera, /number, /scalar) ? long(camera) : 0L
+  capture = idlvideo_capturefromcam(camera)
+  if ~isa(capture, 'idlvideo_capture') then $
+     return, 0B
+  self.capture = ptr_new(capture, /no_copy)
+
+  self.initproperties
+ 
   self.grayscale = keyword_set(grayscale)
   
   return, 1B
