@@ -47,6 +47,7 @@ end
 ; DGGhwVideo::SetProperty
 ;
 pro DGGhwVideo::SetProperty, grayscale = grayscale, $
+                             greyscale = greyscale, $
                              _ref_extra = propertylist
 
   COMPILE_OPT IDL2, HIDDEN
@@ -64,6 +65,9 @@ pro DGGhwVideo::SetProperty, grayscale = grayscale, $
 
   if isa(grayscale, /number, /scalar) then $
      self.grayscale = keyword_set(grayscale)
+
+  if isa(greyscale, /number, /scalar) then $
+     self.grayscale = keyword_set(greyscale)
 end
 
 ;;;;;
@@ -71,7 +75,9 @@ end
 ; DGGhwVideo::GetProperty
 ;
 pro DGGhwVideo::GetProperty, properties = properties, $
+                             dimensions = dimensions, $
                              grayscale = grayscale, $
+                             greyscale = greyscale, $
                              _ref_extra = propertylist
 
   COMPILE_OPT IDL2, HIDDEN
@@ -79,8 +85,15 @@ pro DGGhwVideo::GetProperty, properties = properties, $
   if arg_present(properties) then $
      properties = self.properties.keys()
 
+  if arg_present(dimensions) then $
+     dimensions = [idlvideo_GetProperty(*self.capture, self.properties['width']), $
+                   idlvideo_GetProperty(*self.capture, self.properties['height'])]
+
   if arg_present(grayscale) then $
      grayscale = self.grayscale
+
+  if arg_present(greyscale) then $
+     greyscale = self.grayscale
   
   if isa(propertylist) then begin
      foreach name, strlowcase(propertylist) do begin
