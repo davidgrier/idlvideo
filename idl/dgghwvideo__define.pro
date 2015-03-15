@@ -46,7 +46,8 @@ end
 ;
 ; DGGhwVideo::SetProperty
 ;
-pro DGGhwVideo::SetProperty, grayscale = grayscale, $
+pro DGGhwVideo::SetProperty, dimensions = dimensions, $
+                             grayscale = grayscale, $
                              greyscale = greyscale, $
                              _ref_extra = propertylist
 
@@ -67,6 +68,11 @@ pro DGGhwVideo::SetProperty, grayscale = grayscale, $
 
   if isa(greyscale, /number, /scalar) then $
      self.grayscale = keyword_set(greyscale)
+
+  if isa(dimensions, /number) && (n_elements(dimensions) eq 2) then begin
+     idlvideo_SetProperty(*self.capture, self.properties['width'], dimensions[0])
+     idlvideo_SetProperty(*self.capture, self.properties['height'], dimensions[1])
+  endif
 end
 
 ;;;;;
@@ -182,7 +188,8 @@ end
 ; DGGhwVideo::Init()
 ;
 function DGGhwVideo::Init, camera = camera, $
-                           grayscale = grayscale
+                           grayscale = grayscale, $
+                           greyscale = greyscale
 
   COMPILE_OPT IDL2, HIDDEN
 
@@ -194,7 +201,7 @@ function DGGhwVideo::Init, camera = camera, $
 
   self.initproperties
  
-  self.grayscale = keyword_set(grayscale)
+  self.grayscale = keyword_set(grayscale) || keyword_set(greyscale)
   
   return, 1B
 end
