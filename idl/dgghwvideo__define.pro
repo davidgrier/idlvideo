@@ -70,8 +70,8 @@ pro DGGhwVideo::SetProperty, dimensions = dimensions, $
      self.grayscale = keyword_set(greyscale)
 
   if isa(dimensions, /number) && (n_elements(dimensions) eq 2) then begin
-     idlvideo_SetProperty(*self.capture, self.properties['width'], dimensions[0])
-     idlvideo_SetProperty(*self.capture, self.properties['height'], dimensions[1])
+     err = idlvideo_SetProperty(*self.capture, self.properties['width'], dimensions[0])
+     err = idlvideo_SetProperty(*self.capture, self.properties['height'], dimensions[1])
   endif
 end
 
