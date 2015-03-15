@@ -165,8 +165,6 @@ pro DGGhwVideo::InitProperties
   foreach property, properties do $
      if (idlvideo_GetProperty(*self.capture, self.properties[property]) eq 0) then $
         self.properties.remove, property
-
-  help, self.properties
 end
 
 ;;;;;
