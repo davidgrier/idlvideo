@@ -1,22 +1,29 @@
-SRCS = idlvideo.c
-DLM = idlvideo.dlm
+TARGET = idlvideo
+SRC = $(TARGET).c
+
+SYS  = $(shell uname -s | tr '[:upper:]' '[:lower:]')
+ARCH = $(shell uname -m)
+LIBRARY = $(TARGET).$(SYS).$(ARCH).so
+
+DLM = $(TARGET).dlm
+
 IDL = idl -quiet
 INSTALL = install
 DESTINATION = lib
 
-all: library
+all: $(LIBRARY)
 
-library: $(SRCS)
+$(LIBRARY): $(SRC)
 	@mkdir build 2>/dev/null ||:
-	@$(IDL) compile_idlvideo
+	@$(IDL) compile_$(TARGET)
 
-install: all
+install: $(LIBRARY) $(DLM)
 	sudo $(INSTALL) -d $(DESTINATION)
-	sudo $(INSTALL) *.so $(DLM) $(DESTINATION)
+	sudo $(INSTALL) $(LIBRARY) $(DLM) $(DESTINATION)
 
 uninstall:
 	sudo rm -rf $(DESTINATION)
 
 clean:
-	-rm $(TARGET)
+	-rm $(LIBRARY)
 	-rm build
