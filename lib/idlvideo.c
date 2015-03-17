@@ -39,9 +39,9 @@
 #include <cv.h>
 #include <highgui.h>
 
-// #include "idlvideo.h"
-
 #define IDLVIDEO "idlvideo_capture"
+
+#define cvError(status, func_name, err_msg, file_name, line) (fprintf(stderr,"ok\n");)
 
 //
 // idlvideo__capture

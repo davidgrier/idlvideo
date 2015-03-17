@@ -166,9 +166,13 @@ pro DGGhwVideo::InitProperties
   self.properties = orderedhash(properties, indexes)
 
   ;;; remove inactive properties
-  foreach property, properties do $
-     if (idlvideo_GetProperty(*self.capture, self.properties[property]) eq 0) then $
-        self.properties.remove, property
+  ;;foreach property, properties do $
+  ;;   if (idlvideo_GetProperty(*self.capture, self.properties[property]) eq 0) then $
+  ;;      self.properties.remove, property
+  
+  ;; NOTE: Pruning irrelevant properties results in large numbers of
+  ;; error messages from some backends.  Just stick with the essentials.
+  self.properties = self.properties[['width', 'height']]
 end
 
 ;;;;;
