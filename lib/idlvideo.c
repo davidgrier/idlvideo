@@ -150,7 +150,7 @@ IDL_VPTR idlvideo_read(int argc, IDL_VPTR argv[])
   IDL_VPTR idl_image;
   UCHAR *image, *buffer, pixel;
   unsigned int r, g, b, value;
-  IDL_MEMINT dim2[2], dim3[3], x, y;
+  IDL_MEMINT dims[3], x, y;
 
   capture = idlvideo__capture(argv[0]);
   gray = (argc == 2) ? IDL_LongScalar(argv[1]) : 0;
@@ -159,10 +159,10 @@ IDL_VPTR idlvideo_read(int argc, IDL_VPTR argv[])
 
   buffer = (UCHAR *) frame->imageData;
   if (frame->nChannels == 1) { // Native grayscale image
-    dim2[0] = frame->width;
-    dim2[1] = frame->height;
+    dims[0] = frame->width;
+    dims[1] = frame->height;
     image = (UCHAR *)
-      IDL_MakeTempArray(IDL_TYP_BYTE, 2, dim2, IDL_ARR_INI_NOP, &idl_image);
+      IDL_MakeTempArray(IDL_TYP_BYTE, 2, dims, IDL_ARR_INI_NOP, &idl_image);
     image += (frame->height - 1) * frame->width; // start at last line
     for (y = 0; y < frame->height; y++) {
       memcpy(image, buffer, frame->width);
@@ -170,10 +170,10 @@ IDL_VPTR idlvideo_read(int argc, IDL_VPTR argv[])
       buffer += frame->widthStep;
     }
   } else if (gray) {           // Grayscale image (convert from native BGR)
-    dim2[0] = frame->width;
-    dim2[1] = frame->height;
+    dims[0] = frame->width;
+    dims[1] = frame->height;
     image = (UCHAR *)
-      IDL_MakeTempArray(IDL_TYP_BYTE, 2, dim2, IDL_ARR_INI_NOP, &idl_image);
+      IDL_MakeTempArray(IDL_TYP_BYTE, 2, dims, IDL_ARR_INI_NOP, &idl_image);
     buffer += (frame->height - 1) * frame->widthStep; // start at last line
     for (y = 0; y < frame->height; y++) {
       for (x = 0; x < frame->width; x++) {
@@ -186,11 +186,11 @@ IDL_VPTR idlvideo_read(int argc, IDL_VPTR argv[])
       buffer -= frame->widthStep + frame->nChannels*frame->width;
     }
   } else {                     // RGB image (convert from native BGR)
-    dim3[0] = frame->nChannels;
-    dim3[1] = frame->width;
-    dim3[2] = frame->height;
+    dims[0] = frame->nChannels;
+    dims[1] = frame->width;
+    dims[2] = frame->height;
     image = (UCHAR *)
-      IDL_MakeTempArray(IDL_TYP_BYTE, 3, dim3, IDL_ARR_INI_NOP, &idl_image);
+      IDL_MakeTempArray(IDL_TYP_BYTE, 3, dims, IDL_ARR_INI_NOP, &idl_image);
     buffer += (frame->height - 1) * frame->widthStep; // start at last line
     for (y = 0; y < frame->height; y++) {
       for (x = 0; x < frame->width; x++) {
