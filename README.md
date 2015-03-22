@@ -5,6 +5,8 @@
 IDL is the Interactive Data Language, and is a product of
 [Exelis Visual Information Solutions](http://www.exelisvis.com)
 
+[OpenCV](http://opencv.org) is the Open Source Computer Vision library.
+
 IDLvideo is licensed under the GPLv3.
 
 ## What it does
@@ -26,11 +28,13 @@ This package is written and maintained by David G. Grier
 ## INSTALLATION
 
 Requirements include
+
 1. IDL (or possibly GDL)
 2. OpenCV, including development libraries and headers.
 3. Administrator (sudo) priviledges.
 
 Steps
+
 1. unpack the distribution in a convenient directory.
 2. `cd idlvideo`
 3. `make install`
