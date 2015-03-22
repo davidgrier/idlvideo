@@ -14,8 +14,8 @@ IDLvideo is licensed under the
 
 IDLvideo is a video framegrabber for IDL based on the
 cross-platform OpenCV library.  Its goal is to provide IDL
-with the ability to read images directly from video files
-or video streams.  It has been tested with IDL 8.3 and IDL 8.4
+with the ability to read images directly from video cameras.
+It has been tested with IDL 8.3 and IDL 8.4
 running on both GNU/linux and MacOS systems.
 
 Typical Usage:
@@ -33,7 +33,7 @@ Requirements include
 
 1. IDL (or possibly GDL)
 2. OpenCV, including development libraries and headers.
-3. Administrator (sudo) priviledges.
+3. Administrator (sudo) privileges.
 
 Steps
 
@@ -45,7 +45,7 @@ Steps
 
 ## UNINSTALLATION
 
-Requires administrator (sudo) priviledges
+Requires administrator (sudo) privileges
 
 1. `cd idlvideo`
 2. `make uninstall`
