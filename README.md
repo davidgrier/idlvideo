@@ -7,7 +7,7 @@ IDL is the Interactive Data Language, and is a product of
 
 [OpenCV](http://opencv.org) is the Open Source Computer Vision library.
 
-IDLvideo is licensed under the [GPLv3](http://www.gnu.org/licenses/gpl.html).
+IDLvideo is licensed under the [GPLv3](http://www.gnu.org/licenses.html#GPL).
 
 ## What it does
 
