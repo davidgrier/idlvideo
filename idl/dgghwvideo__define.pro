@@ -10,13 +10,16 @@
 ;    Multimedia, object graphics
 ;
 ; PROPERTIES:
-;    [IG ] CAMERA: Number of camera to use.
-;        Default: 0
-;    [IGS] DIMENSIONS: [nx, ny] Size of image [pixels]
-;        Default: hardware default dimensions.
-;    [IGS] GRAYSCALE: If set, return grayscale images.
-;    [ GS] PROPERTIES: List of OpenCV properties.  Not all of these
-;        may be supported for any particular camera.
+; [IG ] CAMERA: Number of camera to use.
+;       Default: 0
+;
+; [IGS] DIMENSIONS: [nx, ny] Size of image [pixels]
+;       Default: hardware default dimensions.
+;
+; [IGS] GRAYSCALE: If set, return grayscale images.
+;
+; [ GS] PROPERTIES: List of OpenCV properties.  Not all of these
+;       may be supported for any particular camera.
 ;
 ; METHODS:
 ;    GetProperty
