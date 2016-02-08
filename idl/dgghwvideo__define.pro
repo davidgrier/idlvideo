@@ -13,6 +13,8 @@
 ; [IG ] CAMERA: Number of camera to use.
 ;       Default: 0
 ;
+; [I  ] FILENAME: Name of video file to read.
+;
 ; [IGS] DIMENSIONS: [nx, ny] Size of image [pixels]
 ;       Default: hardware default dimensions.
 ;
@@ -32,8 +34,9 @@
 ; 12/30/2010 Written by David G. Grier, New York University
 ; 01/11/2010 DGG Added DGGhwVideo::Snap() function
 ; 03/14/2015 DGG Revamped for DLM interface.
+; 02/08/2016 DGG First implementation of reading from video file.
 ;
-; Copyright (c) 2010-2015 David G. Grier
+; Copyright (c) 2010-2016 David G. Grier
 ;-
 
 ;;;;;
@@ -197,14 +200,20 @@ end
 ; DGGhwVideo::Init()
 ;
 function DGGhwVideo::Init, camera = camera, $
+                           filename = filename, $
                            dimensions = dimensions, $
                            grayscale = grayscale, $
                            greyscale = greyscale
 
   COMPILE_OPT IDL2, HIDDEN
 
-  camera = isa(camera, /number, /scalar) ? long(camera) : 0L
-  capture = idlvideo_capturefromcam(camera)
+  if isa(filename, 'string') then begin
+     capture = idlvideo_capturefromfile(filename)
+  endif else begin
+     camera = isa(camera, /number, /scalar) ? long(camera) : 0L
+     capture = idlvideo_capturefromcam(camera)
+  endelse
+  
   if ~isa(capture, 'idlvideo_capture') then $
      return, 0B
   self.capture = ptr_new(capture, /no_copy)
