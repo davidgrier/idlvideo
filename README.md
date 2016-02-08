@@ -15,7 +15,7 @@ IDLvideo is licensed under the
 IDLvideo is a video framegrabber for IDL based on the
 cross-platform OpenCV library.  Its goal is to provide IDL
 with the ability to read images directly from video cameras.
-It has been tested with IDL 8.3 and IDL 8.4
+It has been tested with IDL 8.3, 8.4 and 8.5
 running on both GNU/linux and MacOS systems.
 
 Typical Usage:

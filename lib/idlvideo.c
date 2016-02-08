@@ -24,8 +24,9 @@
 //  03/14/2015 DGG DLM version.  In transferring data from OpenCV to IDL,
 //     take into account that OpenCV images are in BGR order and are
 //     vertically flipped.  Image copies take this into account.
+// 02/08/2016 DGG Implement CaptureFromFile.
 //
-//  Copyright (c) 2010-2015 David G. Grier
+//  Copyright (c) 2010-2016 David G. Grier
 //
 
 #include <stdlib.h>
@@ -116,6 +117,55 @@ IDL_VPTR idlvideo_CaptureFromCAM (int argc, IDL_VPTR argv[])
 
   // Store camera info in IDLVIDEO structure
   data.camera = (IDL_LONG) camera;
+  data.capture = (IDL_ULONG64) capture;
+  d = IDL_MakeStruct(IDLVIDEO, s_tags);
+  v = IDL_ImportArray(1, &one, IDL_TYP_STRUCT, (UCHAR *) &data, 0, d);
+
+  return v;
+}
+
+//
+// idlvideo_CaptureFromFile
+//
+// Open video file
+//
+// command line arguments
+// argv[0]: IN filename
+//
+IDL_VPTR idlvideo_CaptureFromFile (int argc, IDL_VPTR argv[])
+{
+  int camera = 0;
+  char *filename;
+  CvCapture *capture;
+  IDL_VPTR idl_capture;
+
+  static IDL_MEMINT one = 1;
+  static IDL_STRUCT_TAG_DEF s_tags[] = {
+    { "CAMERA", 0, (void *) IDL_TYP_LONG },
+    { "CAPTURE", 0, (void *) IDL_TYP_ULONG64 },
+    { 0 }
+  };
+
+  typedef struct idlvideo_struct {
+    IDL_LONG camera;
+    IDL_ULONG64 capture;
+  } IDLVIDEO_STRUCT;
+
+  static IDLVIDEO_STRUCT data;
+  void *d;
+  IDL_VPTR v;
+  
+  if (argc != 1)
+    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "No filename specified.");
+
+  filename = IDL_VarGetString(argv[0]);
+  capture = cvCaptureFromFile(filename);
+  if (!capture) {
+    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "Could not open specified file.");
+  }
+
+  // Store camera info in IDLVIDEO structure
+  data.camera = (IDL_LONG) -1;
   data.capture = (IDL_ULONG64) capture;
   d = IDL_MakeStruct(IDLVIDEO, s_tags);
   v = IDL_ImportArray(1, &one, IDL_TYP_STRUCT, (UCHAR *) &data, 0, d);
@@ -254,6 +304,7 @@ int IDL_Load (void)
 {
   static IDL_SYSFUN_DEF2 function_addr[] = {
     { idlvideo_CaptureFromCAM, "IDLVIDEO_CAPTUREFROMCAM", 0, 1, 0, 0},
+    { idlvideo_CaptureFromFile, "IDLVIDEO_CAPTUREFROMFILE", 1, 1, 0, 0},
     { idlvideo_read, "IDLVIDEO_READ", 1, 2, 0, 0 },
     { idlvideo_getproperty, "IDLVIDEO_GETPROPERTY", 2, 2, 0, 0},
     { idlvideo_setproperty, "IDLVIDEO_SETPROPERTY", 3, 3, 0, 0},
