@@ -90,6 +90,19 @@ pro DGGgrVOB::read
   self.eof = isa(data, /scalar)
   if ~self.eof then $
      self.data = ptr_new(data, /no_copy)
+  self.framenumber++
+end
+
+;;;;;
+;
+; DGGGRVOB::Rewind
+;
+pro DGGgrVOB::Rewind
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  self.reopen
+  self.framenumber = 0
 end
 
 ;;;;;
@@ -97,6 +110,8 @@ end
 ; DGGGRVOB::GetProperty
 ;
 pro DGGgrVOB::GetProperty, eof = eof, $
+                           data = data, $
+                           framenumber = framenumber, $
                            dimensions = dimensions, $
                            roi = roi, $
                            _ref_extra = ex
@@ -105,6 +120,12 @@ pro DGGgrVOB::GetProperty, eof = eof, $
 
   if arg_present(eof) then $
      eof = self.eof
+
+  if arg_present(data) then $
+     data = ptr_valid(self.data) ? *self.data : 0L
+  
+  if arg_present(framenumber) then $
+     framenumber = self.framenumber
   
   if arg_present(dimensions) then $
      dimensions = [self.roi[1]-self.roi[0]+1, self.roi[3]-self.roi[2]+1]
@@ -152,9 +173,9 @@ function DGGgrVOB::Init, filename, $
   self.width = 656
   self.height = 480
 
-  if ~self.DGGgrVideo::Init(filename = fn, /gray) then $
+  if ~self.DGGgrVideo::Init(fn, /gray) then $
      return, 0
-  self.read
+;  self.read
   
   if isa(roi, /number) and (n_elements(roi) eq 4) then begin
      if (roi[0] ge roi[1]) or (roi[2] ge roi[3]) or $
@@ -183,6 +204,7 @@ pro DGGgrVOB__define
   struct = {DGGgrVOB, $
             inherits DGGgrVideo, $
             data: ptr_new(), $
+            framenumber: 0UL, $
             eof: 0L, $
             width: 0L, $
             height: 0L, $

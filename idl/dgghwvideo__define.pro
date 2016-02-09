@@ -191,9 +191,31 @@ end
 
 ;;;;;
 ;
-; DGGhwVideo::Cleanup
+; DGGhwVideo::OpenSource
 ;
-pro DGGhwVideo::Cleanup
+pro DGGhwVideo::OpenSource, source
+
+  COMPILE_OPT IDL2, HIDDEN
+  
+  if isa(source, 'string') then begin
+     capture = idlvideo_capturefromfile(source)
+  endif else begin
+     camera = isa(source, /number, /scalar) ? long(source) : 0L
+     capture = idlvideo_capturefromcam(camera)
+  endelse
+
+  self.eof = 1
+  if isa(capture, 'idlvideo_capture') then begin
+     self.capture = ptr_new(capture, /no_copy)
+     self.eof = 0
+  endif
+end
+
+;;;;;
+;
+; DGGhwVideo::CloseSource
+;
+pro DGGhwVideo::CloseSource
 
   COMPILE_OPT IDL2, HIDDEN
 
@@ -205,32 +227,63 @@ end
 
 ;;;;;
 ;
+; DGGhwVideo::Reopen
+;
+pro DGGhwVideo::Reopen
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  if ~ptr_valid(self.capture) then return
+  if (*self.capture).camera ge 0 then return
+  filename = (*self.capture).filename
+  self.closesource
+  self.opensource, filename
+end
+
+;;;;;
+;
+; DGGhwVideo::Close
+;
+pro DGGhwVideo::Close
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  obj_destroy, self
+end
+
+;;;;;
+;
+; DGGhwVideo::Cleanup
+;
+pro DGGhwVideo::Cleanup
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  self.closesource
+end
+
+;;;;;
+;
 ; DGGhwVideo::Init()
 ;
-function DGGhwVideo::Init, camera = camera, $
-                           filename = filename, $
+function DGGhwVideo::Init, source, $
                            dimensions = dimensions, $
                            grayscale = grayscale, $
                            greyscale = greyscale
 
   COMPILE_OPT IDL2, HIDDEN
 
-  if isa(filename, 'string') then begin
-     capture = idlvideo_capturefromfile(filename)
-  endif else begin
-     camera = isa(camera, /number, /scalar) ? long(camera) : 0L
-     capture = idlvideo_capturefromcam(camera)
-  endelse
-  
-  if ~isa(capture, 'idlvideo_capture') then $
+  self.opensource, source
+  if ~isa(*self.capture, 'idlvideo_capture') then $
      return, 0B
-  self.capture = ptr_new(capture, /no_copy)
 
   self.initproperties
 
   if isa(dimensions, /number) && (n_elements(dimensions) eq 2) then begin
-     err = idlvideo_SetProperty(*self.capture, self.properties['width'], dimensions[0])
-     err = idlvideo_SetProperty(*self.capture, self.properties['height'], dimensions[1])
+     err = idlvideo_SetProperty(*self.capture, $
+                                self.properties['width'], dimensions[0])
+     err = idlvideo_SetProperty(*self.capture, $
+                                self.properties['height'], dimensions[1])
   endif
   
   self.grayscale = keyword_set(grayscale) || keyword_set(greyscale)
