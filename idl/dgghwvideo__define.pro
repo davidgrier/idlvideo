@@ -13,7 +13,7 @@
 ; [IG ] CAMERA: Number of camera to use.
 ;       Default: 0
 ;
-; [I  ] FILENAME: Name of video file to read.
+; [IG ] FILENAME: Name of video file to read.
 ;
 ; [IGS] DIMENSIONS: [nx, ny] Size of image [pixels]
 ;       Default: hardware default dimensions.
@@ -87,7 +87,9 @@ end
 ;
 ; DGGhwVideo::GetProperty
 ;
-pro DGGhwVideo::GetProperty, properties = properties, $
+pro DGGhwVideo::GetProperty, camera = camera, $
+                             filename = filename, $
+                             properties = properties, $
                              dimensions = dimensions, $
                              grayscale = grayscale, $
                              greyscale = greyscale, $
@@ -95,6 +97,12 @@ pro DGGhwVideo::GetProperty, properties = properties, $
 
   COMPILE_OPT IDL2, HIDDEN
 
+  if arg_present(camera) then $
+     camera = (*self.capture).camera
+
+  if arg_present(filename) then $
+     filename = (*self.capture).filename
+  
   if arg_present(properties) then $
      properties = self.properties.keys()
 

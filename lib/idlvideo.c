@@ -40,7 +40,20 @@
 #include <cv.h>
 #include <highgui.h>
 
+// Types for creating structure of capture information
 #define IDLVIDEO "idlvideo_capture"
+static IDL_MEMINT one = 1;
+static IDL_STRUCT_TAG_DEF s_tags[] = {
+  { "CAMERA",   0, (void *) IDL_TYP_LONG },
+  { "FILENAME", 0, (void *) IDL_TYP_STRING },
+  { "CAPTURE",  0, (void *) IDL_TYP_ULONG64 },
+  { 0 }
+};
+typedef struct idlvideo_struct {
+  IDL_LONG camera;
+  IDL_STRING filename;
+  IDL_ULONG64 capture;
+} IDLVIDEO_STRUCT;
 
 #define cvError(status, func_name, err_msg, file_name, line) (fprintf(stderr,"ok\n");)
 
@@ -62,7 +75,8 @@ CvCapture * idlvideo__capture (IDL_VPTR s)
   sdef = s->value.s.sdef;
   IDL_StructTagNameByIndex(sdef, 1, IDL_MSG_LONGJMP, &s_name);
   if (strcmp(s_name, IDLVIDEO)) {
-    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "Not a valid camera.");
+    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+		"Not a valid video source.");
     return NULL;
   }
 
@@ -72,7 +86,8 @@ CvCapture * idlvideo__capture (IDL_VPTR s)
 						  IDL_MSG_LONGJMP, NULL));
 
   if (addr == NULL)
-    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "Could not access camera data.");
+    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+		"Could not access video data.");
 
   return (CvCapture *) *addr;
 }
@@ -90,19 +105,6 @@ IDL_VPTR idlvideo_CaptureFromCAM (int argc, IDL_VPTR argv[])
   int camera = 0;
   CvCapture *capture;
   IDL_VPTR idl_capture;
-
-  static IDL_MEMINT one = 1;
-  static IDL_STRUCT_TAG_DEF s_tags[] = {
-    { "CAMERA", 0, (void *) IDL_TYP_LONG },
-    { "CAPTURE", 0, (void *) IDL_TYP_ULONG64 },
-    { 0 }
-  };
-
-  typedef struct idlvideo_struct {
-    IDL_LONG camera;
-    IDL_ULONG64 capture;
-  } IDLVIDEO_STRUCT;
-
   static IDLVIDEO_STRUCT data;
   void *d;
   IDL_VPTR v;
@@ -112,7 +114,8 @@ IDL_VPTR idlvideo_CaptureFromCAM (int argc, IDL_VPTR argv[])
 
   capture = cvCaptureFromCAM(camera);
   if (!capture) {
-    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "Could not open specified camera.");
+    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+		"Could not open specified camera.");
   }
 
   // Store camera info in IDLVIDEO structure
@@ -138,38 +141,24 @@ IDL_VPTR idlvideo_CaptureFromFile (int argc, IDL_VPTR argv[])
   char *filename;
   CvCapture *capture;
   IDL_VPTR idl_capture;
-
-  static IDL_MEMINT one = 1;
-  static IDL_STRUCT_TAG_DEF s_tags[] = {
-    { "CAMERA",   0, (void *) IDL_TYP_LONG },
-    { "FILENAME", 0, (void *) IDL_TYP_STRING },
-    { "CAPTURE",  0, (void *) IDL_TYP_ULONG64 },
-    { 0 }
-  };
-
-  typedef struct idlvideo_struct {
-    IDL_LONG camera;
-    IDL_STRING filename;
-    IDL_ULONG64 capture;
-  } IDLVIDEO_STRUCT;
-
   static IDLVIDEO_STRUCT data;
   void *d;
   IDL_VPTR v;
   
   if (argc != 1)
-    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "No filename specified.");
+    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+		"No filename specified.");
 
   filename = IDL_VarGetString(argv[0]);
   capture = cvCaptureFromFile(filename);
   if (!capture) {
-    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "Could not open specified file.");
+    IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP,
+		"Could not open specified file.");
   }
 
-  // Store info in IDLVIDEO structure
+  // Store video info in IDLVIDEO structure
   data.camera = (IDL_LONG) -1;
-  data.filename = * (IDL_STRING *) argv[0];
-  IDL_StrDup(&(data.filename), 1L);
+  IDL_StrStore(&(data.filename), filename);
   data.capture = (IDL_ULONG64) capture;
   d = IDL_MakeStruct(IDLVIDEO, s_tags);
   v = IDL_ImportArray(1, &one, IDL_TYP_STRUCT, (UCHAR *) &data, 0, d);
