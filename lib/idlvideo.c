@@ -25,6 +25,7 @@
 //     take into account that OpenCV images are in BGR order and are
 //     vertically flipped.  Image copies take this into account.
 // 02/08/2016 DGG Implement CaptureFromFile.
+// 02/09/2016 DGG idlvideo_read returns -1 if read fails.
 //
 //  Copyright (c) 2010-2016 David G. Grier
 //
@@ -199,6 +200,8 @@ IDL_VPTR idlvideo_read(int argc, IDL_VPTR argv[])
   gray = (argc == 2) ? IDL_LongScalar(argv[1]) : 0;
   
   frame = cvQueryFrame(capture);
+  if (!frame)
+    return IDL_GettmpLong(-1);
 
   buffer = (UCHAR *) frame->imageData;
   if (frame->nChannels == 1) { // Native grayscale image

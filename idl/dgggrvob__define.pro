@@ -23,6 +23,7 @@
 ;    framenumber: Current frame number
 ;    data: Image data for current image
 ;    dimensions: [w,h] dimensions of image
+;    EOF: flag: set at end of file.
 ;
 ; METHODS:
 ;    DGGGRVOB::Read
@@ -83,21 +84,28 @@ pro DGGgrVOB::read
 
   COMPILE_OPT IDL2, HIDDEN
 
+  if self.eof then return
+  
   data = self.DGGgrVideo::Read()
-  self.data = ptr_new(data, /no_copy)
-  ;;; check for eof
+  self.eof = isa(data, /scalar)
+  if ~self.eof then $
+     self.data = ptr_new(data, /no_copy)
 end
 
 ;;;;;
 ;
 ; DGGGRVOB::GetProperty
 ;
-pro DGGgrVOB::GetProperty, roi = roi, $
+pro DGGgrVOB::GetProperty, eof = eof, $
                            dimensions = dimensions, $
+                           roi = roi, $
                            _ref_extra = ex
 
   COMPILE_OPT IDL2, HIDDEN
 
+  if arg_present(eof) then $
+     eof = self.eof
+  
   if arg_present(dimensions) then $
      dimensions = [self.roi[1]-self.roi[0]+1, self.roi[3]-self.roi[2]+1]
 
@@ -175,6 +183,7 @@ pro DGGgrVOB__define
   struct = {DGGgrVOB, $
             inherits DGGgrVideo, $
             data: ptr_new(), $
+            eof: 0L, $
             width: 0L, $
             height: 0L, $
             roi: [0L, 0, 0, 0] $
