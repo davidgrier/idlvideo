@@ -141,13 +141,15 @@ IDL_VPTR idlvideo_CaptureFromFile (int argc, IDL_VPTR argv[])
 
   static IDL_MEMINT one = 1;
   static IDL_STRUCT_TAG_DEF s_tags[] = {
-    { "CAMERA", 0, (void *) IDL_TYP_LONG },
-    { "CAPTURE", 0, (void *) IDL_TYP_ULONG64 },
+    { "CAMERA",   0, (void *) IDL_TYP_LONG },
+    { "FILENAME", 0, (void *) IDL_TYP_STRING },
+    { "CAPTURE",  0, (void *) IDL_TYP_ULONG64 },
     { 0 }
   };
 
   typedef struct idlvideo_struct {
     IDL_LONG camera;
+    IDL_STRING filename;
     IDL_ULONG64 capture;
   } IDLVIDEO_STRUCT;
 
@@ -164,8 +166,10 @@ IDL_VPTR idlvideo_CaptureFromFile (int argc, IDL_VPTR argv[])
     IDL_Message(IDL_M_NAMED_GENERIC, IDL_MSG_LONGJMP, "Could not open specified file.");
   }
 
-  // Store camera info in IDLVIDEO structure
+  // Store info in IDLVIDEO structure
   data.camera = (IDL_LONG) -1;
+  data.filename = * (IDL_STRING *) argv[0];
+  IDL_StrDup(&(data.filename), 1L);
   data.capture = (IDL_ULONG64) capture;
   d = IDL_MakeStruct(IDLVIDEO, s_tags);
   v = IDL_ImportArray(1, &one, IDL_TYP_STRUCT, (UCHAR *) &data, 0, d);
