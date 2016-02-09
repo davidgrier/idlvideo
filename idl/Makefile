@@ -1,5 +1,6 @@
 FILES = dgghwvideo__define.pro \
-        dgggrvideo__define.pro
+        dgggrvideo__define.pro \
+        dgggrvob__define.pro
 
 INSTALL = install
 DESTINATION = pro
