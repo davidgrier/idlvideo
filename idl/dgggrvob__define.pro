@@ -70,9 +70,22 @@ function DGGgrVOB::read
 
   COMPILE_OPT IDL2, HIDDEN
 
-  self.data = ptr_new(self.DGGgrVideo::Read())
+  self.read
   data = congrid(*self.data, self.width, self.height, /center, cubic = -0.5)
   return, data[self.roi[0]:self.roi[1], self.roi[2]:self.roi[3]]
+end
+
+;;;;;
+;
+; DGGGRVOB::READ
+;
+pro DGGgrVOB::read
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  data = self.DGGgrVideo::Read()
+  self.data = ptr_new(data, /no_copy)
+  ;;; check for eof
 end
 
 ;;;;;
@@ -133,7 +146,7 @@ function DGGgrVOB::Init, filename, $
 
   if ~self.DGGgrVideo::Init(filename = fn, /gray) then $
      return, 0
-  self.data = ptr_new(self.read()) ; first frame often is bad
+  self.read
   
   if isa(roi, /number) and (n_elements(roi) eq 4) then begin
      if (roi[0] ge roi[1]) or (roi[2] ge roi[3]) or $
