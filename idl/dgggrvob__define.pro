@@ -2,7 +2,20 @@
 
 ;+
 ; Object for extracting properly scaled grayscale video frames from
-; VOB files
+; VOB files.
+;
+; :Examples:
+; Read a frame from a VOB file::
+;
+;    a = DGGgrVOB(filename)
+;    b = a.read()
+;    tvscl, b
+;
+; Play an entire VOB file using function graphics::
+;
+;    a = DGGgrVOB(filename)
+;    im = image(a.read())
+;    while ~a.eof do im.putdata, a.read()
 ;
 ; :Properties:
 ;    filename
