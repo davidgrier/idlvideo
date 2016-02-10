@@ -86,6 +86,26 @@ pro DGGgrVOB::Rewind
 end
 
 ;+
+; Seek specified frame number.
+;
+; :Params:
+;    framenumber : in, required, type=integer
+;-
+pro DGGgrVOB::Seek, framenumber
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  if self.eof || (self.framenumber gt framenumber) then $
+     self.rewind
+  while self.framenumber lt framenumber do begin
+     self.read
+     if self.eof then break
+  endwhile
+  if self.eof then $
+     message, 'end of file encountered before requested frame', /inf
+end
+
+;+
 ; Retrieve properties.
 ;-
 pro DGGgrVOB::GetProperty, eof = eof, $

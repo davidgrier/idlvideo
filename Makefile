@@ -14,7 +14,7 @@ uninstall:
 	make -C lib uninstall DESTINATION=$(LIBDIR)
 
 docs:
-        make -C idl docs
+	make -C idl docs
 
 clean:
 	make -C idl clean
