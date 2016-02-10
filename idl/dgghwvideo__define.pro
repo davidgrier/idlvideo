@@ -1,48 +1,38 @@
+; docformat = 'rst'
+
 ;+
-; NAME:
-;    DGGhwVideo
+; Object class for acquiring a frame-by-frame sequence of images
+; from a video source, based on OpenCV.
 ;
-; PURPOSE:
-;    Object for acquiring a frame-by-frame sequence of images
-;    from a video source, which subclasses from the IDLgrModel class.
-;
-; CATEGORY:
-;    Multimedia, object graphics
-;
-; PROPERTIES:
-; [IG ] CAMERA: Number of camera to use.
-;       Default: 0
-;
-; [IG ] FILENAME: Name of video file to read.
-;
-; [IGS] DIMENSIONS: [nx, ny] Size of image [pixels]
+; :Properties:
+;    camera
+;        Camera number for video acquisition.
+;    filename
+;        Name of video file.
+;    dimensions
+;       Size of image [pixels].
 ;       Default: hardware default dimensions.
+;    grayscale
+;       Convert video frames to grayscale.
+;    greyscale
+;       Synonym for grayscale.
+;    properties
+;       List of OpenCV properties.  Not all of these
+;       may be supported for any particular video source.
 ;
-; [IGS] GRAYSCALE: If set, return grayscale images.
+; :Author:
+;    David G. Grier, New York University
 ;
-; [ GS] PROPERTIES: List of OpenCV properties.  Not all of these
-;       may be supported for any particular camera.
-;
-; METHODS:
-;    GetProperty
-;    SetProperty
-;
-;    DGGhwVideo::Read()
-;        Return next available video frame.
-;
-; MODIFICATION HISTORY:
-; 12/30/2010 Written by David G. Grier, New York University
-; 01/11/2010 DGG Added DGGhwVideo::Snap() function
-; 03/14/2015 DGG Revamped for DLM interface.
-; 02/08/2016 DGG First implementation of reading from video file.
-;
-; Copyright (c) 2010-2016 David G. Grier
+; :Copyright:
+;    Copyright (c) 2010-2016 David G. Grier
 ;-
 
-;;;;;
+;+
+; Read next available video frame.
 ;
-; DGGhwVideo::Read()
-;
+; :Returns:
+;    Array of byte-valued pixel data.
+;_
 function DGGhwVideo::Read
 
   COMPILE_OPT IDL2, HIDDEN
@@ -50,10 +40,9 @@ function DGGhwVideo::Read
   return, idlvideo_read(*self.capture, self.grayscale)
 end
 
-;;;;;
-;
-; DGGhwVideo::SetProperty
-;
+;+
+; Set object properties.
+;-
 pro DGGhwVideo::SetProperty, dimensions = dimensions, $
                              grayscale = grayscale, $
                              greyscale = greyscale, $
@@ -78,15 +67,17 @@ pro DGGhwVideo::SetProperty, dimensions = dimensions, $
      self.grayscale = keyword_set(greyscale)
 
   if isa(dimensions, /number) && (n_elements(dimensions) eq 2) then begin
-     err = idlvideo_SetProperty(*self.capture, self.properties['width'], dimensions[0])
-     err = idlvideo_SetProperty(*self.capture, self.properties['height'], dimensions[1])
+     err = idlvideo_SetProperty(*self.capture, $
+                                self.properties['width'], dimensions[0])
+     err = idlvideo_SetProperty(*self.capture, $
+                                self.properties['height'], dimensions[1])
   endif
 end
 
-;;;;;
-;
-; DGGhwVideo::GetProperty
-;
+
+;+
+; Retrieve object properties
+;-
 pro DGGhwVideo::GetProperty, camera = camera, $
                              filename = filename, $
                              properties = properties, $
@@ -129,10 +120,11 @@ pro DGGhwVideo::GetProperty, camera = camera, $
   endif
 end
 
-;;;;;
+;+
+; Initialize video source properties
 ;
-; DGGhwVideo::InitProperties
-;
+; :Hidden:
+;-
 pro DGGhwVideo::InitProperties
 
   COMPILE_OPT IDL2, HIDDEN
@@ -189,10 +181,15 @@ pro DGGhwVideo::InitProperties
   self.properties = self.properties[['width', 'height']]
 end
 
-;;;;;
+;+
+; Open video source
 ;
-; DGGhwVideo::OpenSource
+; :Params:
+;    source : in, optional, default=0, type=integer|string
+;        Camera number of video file name to use as video source.
 ;
+; :Hidden:
+;-
 pro DGGhwVideo::OpenSource, source
 
   COMPILE_OPT IDL2, HIDDEN
@@ -211,10 +208,11 @@ pro DGGhwVideo::OpenSource, source
   endif
 end
 
-;;;;;
+;+
+; Close video source.
 ;
-; DGGhwVideo::CloseSource
-;
+; :Hidden:
+;-
 pro DGGhwVideo::CloseSource
 
   COMPILE_OPT IDL2, HIDDEN
@@ -225,10 +223,9 @@ pro DGGhwVideo::CloseSource
   endif
 end
 
-;;;;;
-;
-; DGGhwVideo::Reopen
-;
+;+
+; Reopen video source, equivalent to rewinding video.
+;-
 pro DGGhwVideo::Reopen
 
   COMPILE_OPT IDL2, HIDDEN
@@ -240,10 +237,9 @@ pro DGGhwVideo::Reopen
   self.opensource, filename
 end
 
-;;;;;
-;
-; DGGhwVideo::Close
-;
+;+
+; Close the video object.
+;-
 pro DGGhwVideo::Close
 
   COMPILE_OPT IDL2, HIDDEN
@@ -251,10 +247,11 @@ pro DGGhwVideo::Close
   obj_destroy, self
 end
 
-;;;;;
+;+
+; End-of-life cleanup
 ;
-; DGGhwVideo::Cleanup
-;
+; :Hidden:
+;-
 pro DGGhwVideo::Cleanup
 
   COMPILE_OPT IDL2, HIDDEN
@@ -262,10 +259,29 @@ pro DGGhwVideo::Cleanup
   self.closesource
 end
 
-;;;;;
+;+
+; Initialize the video object.
 ;
-; DGGhwVideo::Init()
+; :Returns:
+;    1 for success, 0 for failure.
 ;
+; :Params:
+;    source : in, optional, default=0, type=integer|string
+;        Video source.  Default is the first available video camera.
+;        If a number is provided, that camera number will be used
+;        as the video source, if it can be opened.
+;        If a filename is provided, that file will be the video source.
+;
+; :Keywords:
+;    dimensions : in, optional, type=lonarr(2)
+;        [width, height] of video frame.  Default is
+;        the default geometry of the source.
+;
+;    grayscale : in, optional, type=boolean
+;        Convert video frames to grayscale.
+;    greyscale : in, optional, type=boolean
+;        Synonym for grayscale.
+;-
 function DGGhwVideo::Init, source, $
                            dimensions = dimensions, $
                            grayscale = grayscale, $
@@ -291,12 +307,20 @@ function DGGhwVideo::Init, source, $
   return, 1B
 end
 
-;;;;;
+;+
+; Define the video object class.
 ;
-; DGGhwVideo__define
+; :Fields:
+;    capture : private
+;        Pointer to structure of image capture information
+;    grayscale : type=boolean
+;        Convert to grayscale.
+;    properties
+;        Structure of properties provided by OpenCV for the
+;        video source.
 ;
-; Define the DGGhwVideo object
-;
+; :Hidden:
+;-
 pro DGGhwVideo__define
 
   COMPILE_OPT IDL2, HIDDEN

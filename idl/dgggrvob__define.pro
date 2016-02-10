@@ -1,72 +1,41 @@
+; docformat = 'rst'
+
 ;+
-; NAME:
-;    DGGgrVOB
+; Object for extracting properly scaled grayscale video frames from
+; VOB files
 ;
-; PURPOSE:
-;    Object for extracting properly scaled grayscale video frames from VOB files
+; :Properties:
+;    filename
+;        Name of the VOB file to read.
+;    framenumber
+;        Number of the current frame.
+;    data
+;        Pixel data for the current frame.
+;    dimensions
+;        [nx, ny] dimensions of the video frames
+;    eof
+;        End-of-file flag.
+;    roi
+;        Region of interest within the rescaled video frame.
 ;
-; CATEGORY:
-;    Video processing
+; :Author:
+;    David G. Grier and Bhaskar Jyoti Krishnatreya, New York University
 ;
-; CALLING SEQUENCE:
-;    a = DGGgrVOB(filename)
-;
-; INPUTS:
-;    filename: String containing name of VOB file.  May include
-;        wildcard specifications
-;
-; SUBCLASSES:
-;    DGGgrVideo
-;
-; PROPERTIES:
-;    filename: File name with wildcards expanded
-;    framenumber: Current frame number
-;    data: Image data for current image
-;    dimensions: [w,h] dimensions of image
-;    EOF: flag: set at end of file.
-;
-; METHODS:
-;    DGGGRVOB::Read
-;        Reads next video frame into data buffer
-;
-;    DGGGRVOB::Read()
-;        Reads next video frame and returns the data.
-;
-;    DGGGRVOB::Rewind
-;        Closes and reopens video file at first frame.
-;
-;    GetProperty
-;    SetProperty
-;
-; MODIFICATION HISTORY:
-; 08/20/2013 Written by David G. Grier, New York University
-; 12/06/2013 DGG and Bhaskar Jyoti Krishnatreya Change default
-;    ROI from [4, dim[0]-13, 0, dim[1]-1] to 
-;    [8, dim[0]-9, 0, dim[1]-1] for better compatibility with CCD
-;    cameras.
-; 02/09/2016 DGG revised for DGGgrVideo base class.
-;
-; Copyright (c) 2013-2016 David G. Grier and Bhaskar Jyoti Krishnatreya
+; :Copyright:
+;    Copyright (c) 2013-2016 David G. Grier and
+;    Bhaskar Jyoti Krishnatreya
 ;-
 
-;;;;;
+;+
+; Read the next available video frame, rescale it, crop it to the ROI
+; and return it.
 ;
-; DGGGRVOB::Rewind
+; :Returns:
+;    Array of byte-valued pixel data.
 ;
-pro DGGgrVOB::rewind
-
-  COMPILE_OPT IDL2, HIDDEN
-
-  self.DGGgrVideo::Rewind
-end
-
-;;;;;
-;
-; DGGGRVOB::Read()
-;
-; NOTES: Check options to CONGRID for possible distortions.
+; :Todo: Check options to CONGRID for possible distortions.
 ; CENTER, CUBIC, INTERP, and MINUS_ONE
-;
+;-
 function DGGgrVOB::read
 
   COMPILE_OPT IDL2, HIDDEN
@@ -76,10 +45,9 @@ function DGGgrVOB::read
   return, data[self.roi[0]:self.roi[1], self.roi[2]:self.roi[3]]
 end
 
-;;;;;
-;
-; DGGGRVOB::READ
-;
+;+
+; Store the next available video frame and advance the frame number.
+;-
 pro DGGgrVOB::read
 
   COMPILE_OPT IDL2, HIDDEN
@@ -93,10 +61,9 @@ pro DGGgrVOB::read
   self.framenumber++
 end
 
-;;;;;
-;
-; DGGGRVOB::Rewind
-;
+;+
+; Rewind the current VOB to the beginning.
+;-
 pro DGGgrVOB::Rewind
 
   COMPILE_OPT IDL2, HIDDEN
@@ -105,10 +72,9 @@ pro DGGgrVOB::Rewind
   self.framenumber = 0
 end
 
-;;;;;
-;
-; DGGGRVOB::GetProperty
-;
+;+
+; Retrieve properties.
+;-
 pro DGGgrVOB::GetProperty, eof = eof, $
                            data = data, $
                            framenumber = framenumber, $
@@ -135,21 +101,20 @@ pro DGGgrVOB::GetProperty, eof = eof, $
   self.DGGgrVideo::GetProperty, _strict_extra = ex
 end
 
-;;;;;
+;+
+; Initialize DGGgrVOB class object.
 ;
-; DGGGRVOB::Cleanup
+; :Returns:
+;    1 for success, 0 for failure
 ;
-pro DGGgrVOB::Cleanup
-
-  COMPILE_OPT IDL2, HIDDEN
-
-  self.DGGgrVideo::Cleanup
-end
-
-;;;;;
+; :Params:
+;    filename : in, required, type=string
+;        Name of VOB file to read.
 ;
-; DGGGRVOB::Init()
-;
+; :Keywords:
+;    roi : in, optional, type=`lonarr(4)`
+;        Region of interest within video frame.
+;-
 function DGGgrVOB::Init, filename, $
                          roi = roi
 
@@ -175,7 +140,6 @@ function DGGgrVOB::Init, filename, $
 
   if ~self.DGGgrVideo::Init(fn, /gray) then $
      return, 0
-;  self.read
   
   if isa(roi, /number) and (n_elements(roi) eq 4) then begin
      if (roi[0] ge roi[1]) or (roi[2] ge roi[3]) or $
@@ -193,10 +157,25 @@ function DGGgrVOB::Init, filename, $
   return, 1
 end
 
-;;;;;
+;+
+; Define members of the class.
 ;
-; DGGGRVOB_DEFINE
+; :Fields:
+;    data
+;        Byte-valued array of pixel values.
+;    framenumber
+;        Number of the current video frame.
+;    eof
+;        End-of-file flag.
+;    width
+;        Width of the output video frame [pixels].
+;    height
+;        Height of the output video frame [pixels].
+;    roi
+;        Region of interest within the rescaled video frame.
 ;
+; :Hidden:
+;-
 pro DGGgrVOB__define
 
   COMPILE_OPT IDL2, HIDDEN

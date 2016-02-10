@@ -1,55 +1,59 @@
+; docformat = 'rst'
 ;+
-; NAME:
-;    IDLSNAP
+; Grab one image from a video camera
+; using the IDLvideo interface
 ;
-; PURPOSE:
-;    Grab one image from a video camera
-;    using the IDLvideo interface
+; :Examples:
+; Acquire a frame from the default camera::
 ;
-; CATEGORY:
-;    Image acquisition, Image processing.
+;    a = idlsnap()
 ;
-; CALLING SEQUENCE:
-;    a = idlsnap([camera], [/grayscale])
+; :Params:
+;    camera : in, optional, default=0, type=integer
+;        Camera number.
 ;
-; KEYWORD PARAMETERS:
-;    camera: camera number.  Default: 0
-;
-; KEYWORD FLAGS:
-;    stabilize: keep taking pictures until no pixel varies by more
+; :Keywords:
+;    stabilize : in, optional, type=integer
+;        Keep taking pictures until no pixel varies by more
 ;        than this value.
 ;
-;    quiet: If set, do not provide diagnostic messages.
+;    grayscale : in, optional, type=boolean
+;        Convert image to grayscale.
 ;
-; OUTPUTS:
-;    a: [xsize,ysize] byte array of pixels.
-;       Returns -1 if image acquisition failed.
+;    quiet : in, optional, type=boolean
+;        If set, do not provide diagnostic messages.
 ;
-; PROCEDURE:
-;    Calls routines from the IDLvideo library.
+; :Returns:
+;    [xsize,ysize] byte array of pixels.
+;    Returns -1 if image acquisition failed.
 ;
-; EXAMPLE:
-;    IDL> a = idlsnap()
-;
-; MODIFICATION HISTORY:
+; :History:
 ; 04/30/2003: David G. Grier, The University of Chicago, created.
+;
 ; 09/29/2004: DGG New York University:
 ;                  replaced KEYWORD_SET with N_PARAMS.
 ;                  implemented STABILIZE keyword.
+;
 ; Version 1.1 DGG, New York University.
 ;       Updated for IDL 6.1.
 ;       Try again if library call fails, rather than returning junk.
 ;
 ; Version 2.0 DGG: Updated for OpenCV interface
-; 06/04/2010 DGG major overhaul
-; 06/10/2010 DGG Return -1 on failure.  Add COMPILE_OPT.
-; 12/29/2010 DGG use default geometry for cameras.
-; 03/14/2015 DGG updated for DLM interface
 ;
-; Copyright (c) 2003-2015 David G. Grier
+; 06/04/2010 DGG major overhaul
+;
+; 06/10/2010 DGG Return -1 on failure.  Add COMPILE_OPT.
+;
+; 12/29/2010 DGG use default geometry for cameras.
+;
+; 03/14/2015 DGG updated for DLM interface.
+;
+; :Author:
+;    David G. Grier, New York University
+; :Copyright:
+;    Copyright (c) 2003-2015 David G. Grier
 ;-
-
-function idlsnap, camera = camera, $
+function idlsnap, camera, $
                   grayscale = grayscale, $
                   stabilize = stabilize, $
                   quiet = quiet

@@ -1,6 +1,7 @@
 FILES = dgghwvideo__define.pro \
-        dgggrvideo__define.pro \
-        dgggrvob__define.pro
+	dgggrvideo__define.pro \
+	dgggrvob__define.pro \
+	idlsnap.pro
 
 INSTALL = install
 DESTINATION = pro
@@ -16,3 +17,7 @@ install:
 uninstall:
 	sudo rm $(DESTINATION)/$(FILES)
 	sudo rmdir $(DESTINATION)
+
+docs: $(FILES)
+	@rm -rf docs
+	idl makedocs
