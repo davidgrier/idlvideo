@@ -186,14 +186,15 @@ end
 ;
 ; :Params:
 ;    source : in, optional, default=0, type=integer|string
-;        Camera number of video file name to use as video source.
+;        Camera number or video file name to use as video source.
 ;
 ; :Hidden:
 ;-
 pro DGGhwVideo::OpenSource, source
 
   COMPILE_OPT IDL2, HIDDEN
-  
+
+  self.closesource
   if isa(source, 'string') then begin
      capture = idlvideo_capturefromfile(source)
   endif else begin
@@ -203,6 +204,23 @@ pro DGGhwVideo::OpenSource, source
 
   if isa(capture, 'idlvideo_capture') then $
      self.capture = ptr_new(capture, /no_copy)
+end
+
+;+
+; Open video source and return status
+;
+; :Params:
+;    source : in, optional, default=0, type=integer|string
+;        Camera number or video file name to use as video source
+;
+; :Hidden:
+;-
+function DGGhwVideo::OpenSource, source
+
+  COMPILE_OPT IDL2, HIDDEN
+
+  self.OpenSource, source
+  return, ptr_valid(self.capture)
 end
 
 ;+
@@ -232,6 +250,16 @@ pro DGGhwVideo::Reopen
   filename = (*self.capture).filename
   self.closesource
   self.opensource, filename
+end
+;+
+; Reopen video source, returning status
+;-
+function DGGhwVideo::Reopen
+
+  COMPILE_OPT2, HIDDEN
+
+  self.Reopen
+  return, ptr_valid(self.capture)
 end
 
 ;+

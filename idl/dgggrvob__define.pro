@@ -80,9 +80,8 @@ pro DGGgrVOB::Rewind
 
   COMPILE_OPT IDL2, HIDDEN
 
-  self.reopen
   self.framenumber = 0
-  self.eof = 0
+  self.eof = ~self.reopen()
 end
 
 ;+
