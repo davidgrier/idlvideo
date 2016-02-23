@@ -28,8 +28,6 @@
 ;        [nx, ny] dimensions of the video frames
 ;    eof
 ;        End-of-file flag.
-;    roi
-;        Region of interest within the rescaled video frame.
 ;
 ; :Author:
 ;    David G. Grier and Bhaskar Jyoti Krishnatreya, New York University
@@ -40,7 +38,7 @@
 ;-
 
 ;+
-; Read the next available video frame, rescale it, crop it to the ROI
+; Read the next available video frame, crop its padding, rescale it, 
 ; and return it.
 ;
 ; :Returns:
@@ -54,8 +52,8 @@ function DGGgrVOB::read
   COMPILE_OPT IDL2, HIDDEN
 
   self.read
-  data = congrid(*self.data, self.width, self.height, /center, cubic = -0.5)
-  return, data[self.roi[0]:self.roi[1], self.roi[2]:self.roi[3]]
+  data = (*self.data)[0:-16, *]
+  return, congrid(data, self.width, self.height, /center, cubic = -0.5)
 end
 
 ;+
@@ -112,7 +110,6 @@ pro DGGgrVOB::GetProperty, eof = eof, $
                            data = data, $
                            framenumber = framenumber, $
                            dimensions = dimensions, $
-                           roi = roi, $
                            _ref_extra = ex
 
   COMPILE_OPT IDL2, HIDDEN
@@ -127,9 +124,7 @@ pro DGGgrVOB::GetProperty, eof = eof, $
      framenumber = self.framenumber
   
   if arg_present(dimensions) then $
-     dimensions = [self.roi[1]-self.roi[0]+1, self.roi[3]-self.roi[2]+1]
-
-  if arg_present(roi) then roi = self.roi
+     dimensions = [self.width, self.height]
 
   self.DGGgrVideo::GetProperty, _strict_extra = ex
 end
@@ -143,13 +138,8 @@ end
 ; :Params:
 ;    filename : in, required, type=string
 ;        Name of VOB file to read.
-;
-; :Keywords:
-;    roi : in, optional, type=`lonarr(4)`
-;        Region of interest within video frame.
 ;-
-function DGGgrVOB::Init, filename, $
-                         roi = roi
+function DGGgrVOB::Init, filename
 
   COMPILE_OPT IDL2, HIDDEN
 
@@ -168,24 +158,13 @@ function DGGgrVOB::Init, filename, $
      return, 0
   endif
 
-  self.width = 656
+  self.width = 640
   self.height = 480
 
   if ~self.DGGgrVideo::Init(fn, /gray) then $
      return, 0
-  
-  if isa(roi, /number) and (n_elements(roi) eq 4) then begin
-     if (roi[0] ge roi[1]) or (roi[2] ge roi[3]) or $
-        (roi[0] lt 0) or (roi[1] ge dim[1]) or $
-        (roi[2] lt 0) or (roi[3] ge dim[2]) then begin
-        message, umsg, /inf
-        message, 'ROI: [x0, x1, y0, y1]', /inf
-        self.cleanup
-        return, 0
-     endif
-     self.roi = long(roi)
-  endif else $
-     self.roi = [8, self.width-9, 0, self.height-1]
+
+  self.eof = 0
   
   return, 1
 end
@@ -204,8 +183,6 @@ end
 ;        Width of the output video frame [pixels].
 ;    height
 ;        Height of the output video frame [pixels].
-;    roi
-;        Region of interest within the rescaled video frame.
 ;
 ; :Hidden:
 ;-
@@ -219,7 +196,6 @@ pro DGGgrVOB__define
             framenumber: 0UL, $
             eof: 0L, $
             width: 0L, $
-            height: 0L, $
-            roi: [0L, 0, 0, 0] $
+            height: 0L $
            }
 end

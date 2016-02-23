@@ -201,11 +201,8 @@ pro DGGhwVideo::OpenSource, source
      capture = idlvideo_capturefromcam(camera)
   endelse
 
-  self.eof = 1
-  if isa(capture, 'idlvideo_capture') then begin
+  if isa(capture, 'idlvideo_capture') then $
      self.capture = ptr_new(capture, /no_copy)
-     self.eof = 0
-  endif
 end
 
 ;+
