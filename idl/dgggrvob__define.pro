@@ -82,6 +82,7 @@ pro DGGgrVOB::Rewind
 
   self.reopen
   self.framenumber = 0
+  self.eof = 0
 end
 
 ;+
