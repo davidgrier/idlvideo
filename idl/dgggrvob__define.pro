@@ -67,9 +67,10 @@ pro DGGgrVOB::read
   
   data = self.DGGgrVideo::Read()
   self.eof = isa(data, /scalar)
-  if ~self.eof then $
+  if ~self.eof then begin
      self.data = ptr_new(data, /no_copy)
-  self.framenumber++
+     self.framenumber++
+  endif
 end
 
 ;+
