@@ -35,7 +35,7 @@
 ;_
 function DGGhwVideo::Read
 
-  COMPILE_OPT IDL2, HIDDEN
+  COMPILE_OPT IDL2
 
   return, idlvideo_read(*self.capture, self.grayscale)
 end
@@ -48,7 +48,7 @@ pro DGGhwVideo::SetProperty, dimensions = dimensions, $
                              greyscale = greyscale, $
                              _ref_extra = propertylist
 
-  COMPILE_OPT IDL2, HIDDEN
+  COMPILE_OPT IDL2
 
   if isa(propertylist) then begin
      foreach name, strlowcase(propertylist) do begin
@@ -86,7 +86,7 @@ pro DGGhwVideo::GetProperty, camera = camera, $
                              greyscale = greyscale, $
                              _ref_extra = propertylist
 
-  COMPILE_OPT IDL2, HIDDEN
+  COMPILE_OPT IDL2
 
   if arg_present(camera) then $
      camera = (*self.capture).camera
@@ -127,7 +127,7 @@ end
 ;-
 pro DGGhwVideo::InitProperties
 
-  COMPILE_OPT IDL2, HIDDEN
+  COMPILE_OPT IDL2
 
   ;; obtained from .../include/opencv2/highgui_c.h
   properties = ['time',                 $
@@ -192,7 +192,7 @@ end
 ;-
 pro DGGhwVideo::OpenSource, source
 
-  COMPILE_OPT IDL2, HIDDEN
+  COMPILE_OPT IDL2
 
   self.closesource
   if isa(source, 'string') then begin
@@ -217,7 +217,7 @@ end
 ;-
 function DGGhwVideo::OpenSource, source
 
-  COMPILE_OPT IDL2, HIDDEN
+  COMPILE_OPT IDL2
 
   self.OpenSource, source
   return, ptr_valid(self.capture)
@@ -230,7 +230,7 @@ end
 ;-
 pro DGGhwVideo::CloseSource
 
-  COMPILE_OPT IDL2, HIDDEN
+  COMPILE_OPT IDL2
 
   if ptr_valid(self.capture) then begin
      idlvideo_releasecapture, *self.capture
@@ -243,7 +243,7 @@ end
 ;-
 pro DGGhwVideo::Reopen
 
-  COMPILE_OPT IDL2, HIDDEN
+  COMPILE_OPT IDL2
 
   if ~ptr_valid(self.capture) then return
   if (*self.capture).camera ge 0 then return
@@ -256,7 +256,7 @@ end
 ;-
 function DGGhwVideo::Reopen
 
-  COMPILE_OPT2, HIDDEN
+  COMPILE_OPT IDL2
 
   self.Reopen
   return, ptr_valid(self.capture)
@@ -267,7 +267,7 @@ end
 ;-
 pro DGGhwVideo::Close
 
-  COMPILE_OPT IDL2, HIDDEN
+  COMPILE_OPT IDL2
 
   obj_destroy, self
 end
@@ -279,7 +279,7 @@ end
 ;-
 pro DGGhwVideo::Cleanup
 
-  COMPILE_OPT IDL2, HIDDEN
+  COMPILE_OPT IDL2
 
   self.closesource
 end
@@ -312,7 +312,7 @@ function DGGhwVideo::Init, source, $
                            grayscale = grayscale, $
                            greyscale = greyscale
 
-  COMPILE_OPT IDL2, HIDDEN
+  COMPILE_OPT IDL2
 
   self.opensource, source
   if ~isa(*self.capture, 'idlvideo_capture') then $
