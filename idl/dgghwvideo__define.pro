@@ -74,7 +74,6 @@ pro DGGhwVideo::SetProperty, dimensions = dimensions, $
   endif
 end
 
-
 ;+
 ; Retrieve object properties
 ;-
@@ -251,6 +250,7 @@ pro DGGhwVideo::Reopen
   self.closesource
   self.opensource, filename
 end
+
 ;+
 ; Reopen video source, returning status
 ;-
