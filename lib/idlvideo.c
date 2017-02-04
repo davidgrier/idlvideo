@@ -26,6 +26,7 @@
 //     vertically flipped.  Image copies take this into account.
 // 02/08/2016 DGG Implement CaptureFromFile.
 // 02/09/2016 DGG idlvideo_read returns -1 if read fails.
+// 02/04/2017 DGG update for OpenCV 3.2
 //
 //  Copyright (c) 2010-2016 David G. Grier
 //
@@ -38,8 +39,10 @@
 #include <idl_export.h>
 
 // OpenCV support
-#include <cv.h>
-#include <highgui.h>
+//#include <cv.h>
+//#include <highgui.h>
+#include "opencv2/core/core_c.h"
+#include "opencv2/videoio/videoio_c.h"
 
 // Types for creating structure of capture information
 #define IDLVIDEO "idlvideo_capture"
