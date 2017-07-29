@@ -2,8 +2,24 @@ IDLDIR = /usr/local/IDL
 PRODIR = $(IDLDIR)/idlvideo
 LIBDIR = $(PRODIR)
 
+VERSION = 1.0.0
+RELEASE = 1
+
+CIDESC = --pkgname=idlvideo \
+	--pkgversion=$(VERSION) \
+	--pkgrelease=$(RELEASE) \
+	--pkglicense=GPL \
+	--maintainer=david.grier@nyu.edu \
+	--provides=idlvideo \
+	--nodoc
+
+CIOPTS = -D --install=yes $(CIDESC)
+
 all: 
 	make -C lib
+
+deb: all
+	sudo checkinstall $(CIOPTS)
 
 install: all
 	make -C idl install DESTINATION=$(PRODIR)
